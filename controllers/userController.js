@@ -5,7 +5,11 @@ const jwt = require('../helpers/jwt')
 
 //methods
 const store = async (req, res) => {
+  console.log('user criado no middleware pego no controller', req.user)
   let data = req.body
+
+  //validação meio idiota, mas vou deixar aqui
+  if (!req.user) return res.json({ message: 'Error token' })
 
   let user = await User.find({ email: data.email })
 
