@@ -2,6 +2,7 @@
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('../helpers/jwt')
+const { InvalidLogin } = require('../errors/exceptions')
 
 //methods
 const store = async (req, res) => {
@@ -31,18 +32,24 @@ const store = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body
 
-  let user = await User.find({ email })
-  if (!user.length > 0) {
-    return res.json({ message: 'E-mail não encontrado' })
-  }
+  try {
+    let user = await User.find({ email })
 
-  bcrypt.compare(password, user[0].password, async (err, check) => {
-    if (!check) {
-      return res.json({ message: 'Credenciais inválidas ' })
+    if (!user) {
+      throw new InvalidLogin(401)
     }
+
+    const match = await bcrypt.compareSync(password, user[0].password)
+    console.log('match')
+    if (!match) {
+      throw new InvalidLogin(401)
+    }
+
     const token = await jwt.createToken(user[0])
     return res.json({ user: user[0], token })
-  })
+  } catch (error) {
+    res.status(error.status).json(error)
+  }
 }
 
 module.exports = { store, login }

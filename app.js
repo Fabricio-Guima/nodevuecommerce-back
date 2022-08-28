@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const cors = require('cors')
 const app = express()
 
 //conexao banco
@@ -19,8 +20,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 //evitar erro de cors
+app.use(cors())
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Origin', '*', 'http://localhost:8080')
   res.header(
     'Access-Control-Allow-Headers',
     'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Access-Control-Allow-Request-Method'
