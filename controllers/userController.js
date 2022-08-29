@@ -2,31 +2,44 @@
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('../helpers/jwt')
-const { InvalidLogin } = require('../errors/exceptions')
+const { InvalidLogin, InvalidEmail } = require('../errors/exceptions')
 
 //methods
+const index = async (req, res) => {
+  if (!req.user) return res.json({ message: 'Error token' })
+  try {
+    let users = await User.find()
+
+    res.status(200).json(users)
+  } catch (error) {
+    res.status(500).json({ message: 'Error ao listar os usuários' })
+  }
+}
 const store = async (req, res) => {
   console.log('user criado no middleware pego no controller', req.user)
   let data = req.body
+  try {
+    //validação meio idiota, mas vou deixar aqui
+    if (!req.user) return res.json({ message: 'Error token' })
 
-  //validação meio idiota, mas vou deixar aqui
-  if (!req.user) return res.json({ message: 'Error token' })
+    let user = await User.find({ email: data.email })
 
-  let user = await User.find({ email: data.email })
-
-  if (user.length > 0) {
-    return res.json({ message: 'E-mail inválido para cadastrar usuário' })
-  }
-
-  bcrypt.hash('123456', 10, async (err, hash) => {
-    if (err) {
-      res.json({ data: undefined, message: 'Não foi possível gerar a senha' })
+    if (user.length > 0) {
+      throw new InvalidEmail(401)
     }
 
-    data.password = hash
-    let user = await User.create(data)
-    return res.status(200).json(user)
-  })
+    bcrypt.hash('123456', 10, async (err, hash) => {
+      if (err) {
+        res.json({ data: undefined, message: 'Não foi possível gerar a senha' })
+      }
+
+      data.password = hash
+      let user = await User.create(data)
+      return res.status(200).json(user)
+    })
+  } catch (error) {
+    res.status(error.status).json(error)
+  }
 }
 
 const login = async (req, res) => {
@@ -52,4 +65,4 @@ const login = async (req, res) => {
   }
 }
 
-module.exports = { store, login }
+module.exports = { index, store, login }

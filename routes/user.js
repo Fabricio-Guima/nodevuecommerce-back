@@ -6,6 +6,7 @@ const authenticate = require('../middlewares/authenticate')
 const userController = require('../controllers/userController')
 
 //Routes
+route.get('/users', authenticate.decodeToken, userController.index)
 route.post('/users', authenticate.decodeToken, userController.store)
 route.post('/login', userController.login)
 
