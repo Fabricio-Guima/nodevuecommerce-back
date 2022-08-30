@@ -49,6 +49,33 @@ const store = async (req, res) => {
     res.status(error.status).json(error)
   }
 }
+const show = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    let user = await User.findById({ _id: id })
+    console.log('user show', user)
+    res.status(200).json(user)
+  } catch (error) {
+    console.log('error', error)
+  }
+}
+
+const update = async (req, res) => {
+  if (!req.user) return res.status(401).json({ message: 'Error token' })
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      {
+        new: true,
+      }
+    )
+    res.status(200).json(user)
+  } catch (error) {
+    res.status(error.status).json(error)
+  }
+}
 
 const login = async (req, res) => {
   const { email, password } = req.body
@@ -73,4 +100,4 @@ const login = async (req, res) => {
   }
 }
 
-module.exports = { index, store, login }
+module.exports = { index, store, show, update, login }
