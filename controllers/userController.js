@@ -7,8 +7,16 @@ const { InvalidLogin, InvalidEmail } = require('../errors/exceptions')
 //methods
 const index = async (req, res) => {
   if (!req.user) return res.json({ message: 'Error token' })
+  let filter = req.params.filter || ''
+  console.log('filter ', filter)
   try {
-    let users = await User.find()
+    let users = await User.find({
+      $or: [
+        { name: new RegExp(filter, 'i') },
+        { nickname: new RegExp(filter, 'i') },
+        { email: new RegExp(filter, 'i') },
+      ],
+    })
 
     res.status(200).json(users)
   } catch (error) {
