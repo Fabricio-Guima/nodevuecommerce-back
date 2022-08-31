@@ -128,4 +128,10 @@ const login = async (req, res) => {
   }
 }
 
-module.exports = { index, store, show, update, updateStatus, login }
+const me = async (req, res) => {
+  if (!req.user) return res.status(401).json({ message: 'Error token' })
+
+  return res.status(200).json({ user: req.user })
+}
+
+module.exports = { index, store, show, update, updateStatus, login, me }

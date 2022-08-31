@@ -16,5 +16,6 @@ route.put(
   userController.updateStatus
 )
 route.post('/login', userController.login)
+route.get('/me', authenticate.decodeToken, userController.me)
 
 module.exports = route
