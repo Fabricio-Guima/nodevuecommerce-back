@@ -77,6 +77,26 @@ const update = async (req, res) => {
   }
 }
 
+const updateStatus = async (req, res) => {
+  console.log('back updateStatus', req.body)
+  console.log('back updateStatus', req.params.id)
+  if (!req.user) return res.status(401).json({ message: 'Error token' })
+
+  let status = !req.body.status
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      { status: status },
+      {
+        new: true,
+      }
+    )
+    res.status(200).json(user)
+  } catch (error) {
+    res.status(error.status).json(error)
+  }
+}
+
 const login = async (req, res) => {
   const { email, password } = req.body
 
@@ -100,4 +120,4 @@ const login = async (req, res) => {
   }
 }
 
-module.exports = { index, store, show, update, login }
+module.exports = { index, store, show, update, updateStatus, login }
