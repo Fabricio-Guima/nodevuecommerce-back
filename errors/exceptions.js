@@ -8,6 +8,16 @@ const InvalidLogin = class UserServiceError extends Error {
   }
 }
 
+const BlockedUser = class UserServiceError extends Error {
+  constructor(...args) {
+    super(...args)
+    console.error(args)
+    this.code = 'ERR_BLOCKED_USER'
+    this.name = 'BlockedUser'
+    this.status = args[0]
+  }
+}
+
 const InvalidEmail = class UserServiceError extends Error {
   constructor(...args) {
     super(...args)
@@ -21,4 +31,5 @@ const InvalidEmail = class UserServiceError extends Error {
 module.exports = {
   InvalidLogin,
   InvalidEmail,
+  BlockedUser,
 }

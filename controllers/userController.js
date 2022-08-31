@@ -2,7 +2,11 @@
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('../helpers/jwt')
-const { InvalidLogin, InvalidEmail } = require('../errors/exceptions')
+const {
+  InvalidLogin,
+  InvalidEmail,
+  BlockedUser,
+} = require('../errors/exceptions')
 
 //methods
 const index = async (req, res) => {
@@ -105,6 +109,10 @@ const login = async (req, res) => {
 
     if (!user) {
       throw new InvalidLogin(401)
+    }
+
+    if (!user[0].status) {
+      throw new BlockedUser(401)
     }
 
     const match = await bcrypt.compareSync(password, user[0].password)
