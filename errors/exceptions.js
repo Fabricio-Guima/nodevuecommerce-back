@@ -28,8 +28,19 @@ const InvalidEmail = class UserServiceError extends Error {
   }
 }
 
+const InvalidProduct = class UserServiceError extends Error {
+  constructor(...args) {
+    super(...args)
+    console.error(args)
+    this.code = 'ERR_INVALID_PRODUCT'
+    this.name = 'InvalidProduct'
+    this.status = args[0]
+  }
+}
+
 module.exports = {
   InvalidLogin,
   InvalidEmail,
   BlockedUser,
+  InvalidProduct,
 }

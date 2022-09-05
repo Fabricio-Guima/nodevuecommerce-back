@@ -1,12 +1,8 @@
 //models
-const User = require('../models/user')
-const bcrypt = require('bcrypt')
-const jwt = require('../helpers/jwt')
-const {
-  InvalidLogin,
-  InvalidEmail,
-  BlockedUser,
-} = require('../errors/exceptions')
+const Product = require('../models/product')
+const { BlockedUser, InvalidProduct } = require('../errors/exceptions')
+
+const slugify = require('slugify')
 
 //methods
 const index = async (req, res) => {
@@ -28,29 +24,26 @@ const index = async (req, res) => {
   }
 }
 const store = async (req, res) => {
-  console.log('user criado no middleware pego no controller', req.user)
-  let data = req.body
+  if (!req.user) return res.status(401).json({ message: 'Error token' })
+  if (!req.image)
+    return res.status(401).json({ message: 'Não foi possível salvar imagem' })
+
+  var product = req.body
+  const finalProduct = req.body
+  finalProduct.image = req.image
+  product.image = req.image
+
   try {
-    //validação meio idiota, mas vou deixar aqui
-    if (!req.user) return res.json({ message: 'Error token' })
+    product = await Product.findOne({ name: product.name })
 
-    let user = await User.find({ email: data.email })
-
-    if (user.length > 0) {
-      throw new InvalidEmail(401)
+    if (product) {
+      throw new InvalidProduct(401)
     }
+    let result = await Product.create(finalProduct)
 
-    bcrypt.hash('123456', 10, async (err, hash) => {
-      if (err) {
-        res.json({ data: undefined, message: 'Não foi possível gerar a senha' })
-      }
-
-      data.password = hash
-      let user = await User.create(data)
-      return res.status(200).json(user)
-    })
+    return res.status(200).json(result)
   } catch (error) {
-    res.status(error.status).json(error)
+    res.status(400).json({ message: error })
   }
 }
 const show = async (req, res) => {
