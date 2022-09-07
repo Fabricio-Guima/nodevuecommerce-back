@@ -10,15 +10,14 @@ const index = async (req, res) => {
   let filter = req.params.filter || ''
   console.log('filter ', filter)
   try {
-    let users = await User.find({
+    let products = await Product.find({
       $or: [
         { name: new RegExp(filter, 'i') },
-        { nickname: new RegExp(filter, 'i') },
-        { email: new RegExp(filter, 'i') },
+        { category: new RegExp(filter, 'i') },
       ],
     })
 
-    res.status(200).json(users)
+    res.status(200).json(products)
   } catch (error) {
     res.status(500).json({ message: 'Error ao listar os usuários' })
   }
@@ -30,6 +29,7 @@ const store = async (req, res) => {
 
   var product = req.body
   const finalProduct = req.body
+  finalProduct.slug = slugify(req.body.name)
   finalProduct.image = req.image
   product.image = req.image
 
