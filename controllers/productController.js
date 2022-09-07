@@ -1,14 +1,14 @@
 //models
 const Product = require('../models/product')
 const { BlockedUser, InvalidProduct } = require('../errors/exceptions')
-
+const fs = require('fs')
 const slugify = require('slugify')
 
 //methods
 const index = async (req, res) => {
   if (!req.user) return res.json({ message: 'Error token' })
   let filter = req.params.filter || ''
-  console.log('filter ', filter)
+
   try {
     let products = await Product.find({
       $or: [
@@ -121,10 +121,9 @@ const login = async (req, res) => {
   }
 }
 
-const me = async (req, res) => {
-  if (!req.user) return res.status(401).json({ message: 'Error token' })
-
-  return res.status(200).json({ user: req.user })
+const getImage = async (req, res) => {
+  let image = req.params.image
+  fs.stat(`/uploads/products/${image}`, err => {})
 }
 
 const products = async (req, res) => {
@@ -139,6 +138,6 @@ module.exports = {
   update,
   updateStatus,
   login,
-  me,
   products,
+  getImage,
 }
