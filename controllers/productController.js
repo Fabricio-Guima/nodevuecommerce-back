@@ -64,19 +64,14 @@ const show = async (req, res) => {
 const update = async (req, res) => {
   if (!req.user) return res.status(401).json({ message: 'Error token' })
   try {
-    const product = await Product.findById(
-      { _id: req.params.id },
-      {
-        new: true,
-      }
-    )
+    const product = await Product.findById({ _id: req.params.id })
+    console.log('product', product)
 
     //deletar a imagem no cloudinary
     if (product.image) {
       const splitedNameImage = product.image.split('/')
       const nameImage = splitedNameImage[splitedNameImage.length - 1]
       const [public_id] = nameImage.split('.')
-
       cloudinary.uploader.destroy(public_id)
     }
 
