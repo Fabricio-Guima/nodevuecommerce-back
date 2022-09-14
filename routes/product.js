@@ -1,6 +1,6 @@
 const express = require('express')
 const route = express.Router()
-const upload = require('../middlewares/upload')
+const { uploadCloudinary } = require('../middlewares/upload')
 
 //middlewares
 const authenticate = require('../middlewares/authenticate')
@@ -15,7 +15,7 @@ route.get(
 )
 route.post(
   '/products',
-  [authenticate.decodeToken, upload],
+  [authenticate.decodeToken, uploadCloudinary],
   productController.store
 )
 route.get('/products/:id', authenticate.decodeToken, productController.show)
@@ -24,6 +24,12 @@ route.put(
   '/products/:id/status',
   authenticate.decodeToken,
   productController.updateStatus
+)
+
+route.put(
+  '/uploads/:id',
+  uploadCloudinary,
+  productController.updateImageCloudinary
 )
 
 module.exports = route
