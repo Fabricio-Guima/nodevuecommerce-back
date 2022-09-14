@@ -19,17 +19,17 @@ route.post(
   productController.store
 )
 route.get('/products/:id', authenticate.decodeToken, productController.show)
-route.put('/products/:id', authenticate.decodeToken, productController.update)
+route.put(
+  '/products/:id',
+  [authenticate.decodeToken, uploadCloudinary],
+  productController.update
+)
 route.put(
   '/products/:id/status',
   authenticate.decodeToken,
   productController.updateStatus
 )
 
-route.put(
-  '/uploads/:id',
-  uploadCloudinary,
-  productController.updateImageCloudinary
-)
+route.put('/uploads/:id', productController.updateImageCloudinary)
 
 module.exports = route

@@ -55,7 +55,6 @@ const show = async (req, res) => {
 
   try {
     let product = await Product.findById({ _id: id })
-    console.log('product show', product)
     res.status(200).json(product)
   } catch (error) {
     console.log('error', error)
@@ -65,22 +64,39 @@ const show = async (req, res) => {
 const update = async (req, res) => {
   if (!req.user) return res.status(401).json({ message: 'Error token' })
   try {
-    const user = await User.findByIdAndUpdate(
+    const product = await Product.findById(
       { _id: req.params.id },
-      req.body,
       {
         new: true,
       }
     )
-    res.status(200).json(user)
+
+    //deletar a imagem no cloudinary
+    if (product.image) {
+      const splitedNameImage = product.image.split('/')
+      const nameImage = splitedNameImage[splitedNameImage.length - 1]
+      const [public_id] = nameImage.split('.')
+
+      cloudinary.uploader.destroy(public_id)
+    }
+
+    //...spread operator nao quer funcionar
+    product.name = req.body.name
+    product.category = req.body.category
+    product.status = req.body.status
+    product.discount = req.body.discount
+    product.price = req.body.price
+    product.description = req.body.description
+    product.image = req.image
+    product.save()
+
+    res.status(200).json(product)
   } catch (error) {
     res.status(error.status).json(error)
   }
 }
 
 const updateStatus = async (req, res) => {
-  console.log('back updateStatus', req.body)
-  console.log('back updateStatus', req.params.id)
   if (!req.user) return res.status(401).json({ message: 'Error token' })
 
   let status = !req.body.status
@@ -145,13 +161,11 @@ const updateImageCloudinary = async (req, res) => {
       throw new InvalidProduct(401)
     }
 
-    console.log('req.image', req.image)
-
     if (product.image) {
       const splitedNameImage = product.image.split('/')
       const nameImage = splitedNameImage[splitedNameImage.length - 1]
       const [public_id] = nameImage.split('.')
-      console.log('public_id', public_id)
+
       cloudinary.uploader.destroy(public_id)
     }
 

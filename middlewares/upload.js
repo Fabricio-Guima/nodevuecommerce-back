@@ -30,7 +30,6 @@ const uploadCloudinary = async (req, res, next) => {
   if (!req.files) {
     return res.status(400).send('No files were uploaded.')
   }
-  console.log('key', process.env.CLOUDINARY_URL)
   try {
     // const extension = req.files.image.mimetype.split('/')[1]
     // const newName = uuidv4() + '.' + extension
@@ -39,7 +38,7 @@ const uploadCloudinary = async (req, res, next) => {
     const { secure_url } = await cloudinary.uploader.upload(tempFilePath)
 
     req.image = secure_url
-    console.log('secure_url', secure_url)
+
     next()
   } catch (e) {
     console.log('erro upload cloudinary', e)
