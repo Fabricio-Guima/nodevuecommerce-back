@@ -3,6 +3,10 @@ const Product = require('../models/product')
 const { BlockedUser, InvalidProduct } = require('../errors/exceptions')
 const fs = require('fs')
 const slugify = require('slugify')
+const path = require('path')
+const mongoose = require('mongoose')
+const { uploadCloudinary } = require('../middlewares/upload')
+const cloudinary = require('cloudinary').v2
 
 //methods
 const index = async (req, res) => {
@@ -50,9 +54,9 @@ const show = async (req, res) => {
   const { id } = req.params
 
   try {
-    let user = await User.findById({ _id: id })
-    console.log('user show', user)
-    res.status(200).json(user)
+    let product = await Product.findById({ _id: id })
+    console.log('product show', product)
+    res.status(200).json(product)
   } catch (error) {
     console.log('error', error)
   }
@@ -94,41 +98,70 @@ const updateStatus = async (req, res) => {
   }
 }
 
-const login = async (req, res) => {
-  const { email, password } = req.body
+// const updateImage = async (req, res) => {
+//   const { id } = req.params
+
+//   try {
+//     let product = await Product.findById({ _id: id })
+//     console.log('product aqui', product)
+
+//     if (!product) {
+//       throw new InvalidProduct(401)
+//     }
+
+//     if (product.image) {
+//       const imagePath = path.join(
+//         __dirname,
+//         '../uploads/products',
+//         product.image
+//       )
+//       console.log('imagePath', imagePath)
+//       //busque e elimine a imagem
+//       if (fs.existsSync(imagePath)) {
+//         console.log('apagando a imagem')
+//         fs.unlinkSync(imagePath)
+//       }
+
+//       product.image = req.image
+//     }
+
+//     product.image = 'kkkkkkkkkkkkkkkkkkk'
+
+//     console.log('produto final com imagem atualizada', product)
+
+//     res.status(200).json(product)
+//   } catch (error) {
+//     res.status(400).json(error)
+//   }
+// }
+
+const updateImageCloudinary = async (req, res) => {
+  const { id } = req.params
 
   try {
-    let user = await User.find({ email })
+    let product = await Product.findById({ _id: id })
 
-    if (!user) {
-      throw new InvalidLogin(401)
+    if (!product) {
+      throw new InvalidProduct(401)
     }
 
-    if (!user[0].status) {
-      throw new BlockedUser(401)
+    console.log('req.image', req.image)
+
+    if (product.image) {
+      const splitedNameImage = product.image.split('/')
+      const nameImage = splitedNameImage[splitedNameImage.length - 1]
+      const [public_id] = nameImage.split('.')
+      console.log('public_id', public_id)
+      cloudinary.uploader.destroy(public_id)
     }
 
-    const match = await bcrypt.compareSync(password, user[0].password)
-    console.log('match')
-    if (!match) {
-      throw new InvalidLogin(401)
-    }
+    product.image = req.image
+    product.save()
 
-    const token = await jwt.createToken(user[0])
-    return res.json({ user: user[0], token })
+    res.status(200).json(product)
   } catch (error) {
-    res.status(error.status).json(error)
+    console.log('error', error)
   }
-}
-
-const getImage = async (req, res) => {
-  let image = req.params.image
-  fs.stat(`/uploads/products/${image}`, err => {})
-}
-
-const products = async (req, res) => {
-  console.log('req.body', req.body)
-  res.status(200).json(req.body)
 }
 
 module.exports = {
@@ -137,7 +170,5 @@ module.exports = {
   show,
   update,
   updateStatus,
-  login,
-  products,
-  getImage,
+  updateImageCloudinary,
 }

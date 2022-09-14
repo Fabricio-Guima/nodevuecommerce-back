@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -6,15 +7,19 @@ const fileUpload = require('express-fileupload')
 
 //conexao banco
 const PORT = process.env.PORT || 3000
-mongoose.connect('mongodb://127.0.0.1:27017/loja-node', (error, res) => {
-  if (error) {
-    console.log('Error ao conectar no banco: ', error)
-  } else {
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`)
-    })
+mongoose.connect(
+  'mongodb://127.0.0.1:27017/loja-node',
+  { useNewUrlParser: true, useUnifiedTopology: true, createIndexes: true },
+  (error, res) => {
+    if (error) {
+      console.log('Error ao conectar no banco: ', error)
+    } else {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`)
+      })
+    }
   }
-})
+)
 
 //body-parser
 app.use(express.json())
