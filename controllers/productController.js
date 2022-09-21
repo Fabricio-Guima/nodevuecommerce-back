@@ -19,7 +19,7 @@ const index = async (req, res) => {
         { name: new RegExp(filter, 'i') },
         { category: new RegExp(filter, 'i') },
       ],
-    })
+    }).sort({ createdAt: -1 })
 
     res.status(200).json(products)
   } catch (error) {
@@ -81,6 +81,7 @@ const update = async (req, res) => {
     product.status = req.body.status
     product.discount = req.body.discount
     product.price = req.body.price
+    product.variety = req.body.variety
     product.description = req.body.description
     product.image = req.image
     product.save()
