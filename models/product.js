@@ -8,6 +8,7 @@ const productSchema = Schema({
   price: { type: Number, required: true },
   description: { type: String, required: true },
   image: { type: String, required: false },
+  stock: { type: Number, default: 0, required: false },
   variety: { type: String, required: false },
   status: { type: Boolean, default: true, required: true },
   discount: { type: Boolean, default: true, required: true },

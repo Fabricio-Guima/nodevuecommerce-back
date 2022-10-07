@@ -1,5 +1,6 @@
 //models
 const Product = require('../models/product')
+const Variety = require('../models/variety')
 const { BlockedUser, InvalidProduct } = require('../errors/exceptions')
 const fs = require('fs')
 const slugify = require('slugify')
@@ -174,6 +175,29 @@ const updateImageCloudinary = async (req, res) => {
   }
 }
 
+//variedade com produtos
+const createVariety = async (req, res) => {
+  console.log('req.body', req.body)
+  try {
+    let variety = await Variety.create(req.body)
+
+    res.status(200).json(variety)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getVarietiesProduct = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    let variety = await Variety.findOne({ product: id }).sort({ createdAt: 1 })
+    res.status(200).json(variety)
+  } catch (error) {
+    console.log('error', error)
+  }
+}
+
 module.exports = {
   index,
   store,
@@ -181,4 +205,6 @@ module.exports = {
   update,
   updateStatus,
   updateImageCloudinary,
+  createVariety,
+  getVarietiesProduct,
 }

@@ -32,4 +32,17 @@ route.put(
 
 route.put('/uploads/:id', productController.updateImageCloudinary)
 
+//variedades
+route.post(
+  '/varieties',
+  authenticate.decodeToken,
+  productController.createVariety
+)
+
+route.get(
+  '/varieties/:id',
+  authenticate.decodeToken,
+  productController.getVarietiesProduct
+)
+
 module.exports = route
